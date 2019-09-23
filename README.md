@@ -1,6 +1,7 @@
 # php-nginx-mysql-compose
 docker-compose php + nginx + mysql
 
+参考[ocker-compose搭建nginx+php+mysql](https://www.jianshu.com/p/0561d3cfccda)
 ## 安装docker
 
 ```
