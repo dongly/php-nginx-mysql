@@ -1,50 +1,52 @@
 version: '2'
 services:
     nginx:
-        image: nginx:latest
+        image: nginx:alpine
+        restart: always
         # 端口映射
         ports:
             - "80:80"
         # 依赖关系 先跑php
-        depends_on:
-            - "php"
+        # depends_on:
+        #     - "php"
         # 数据卷
         volumes:
             # 映射主机./conf.d目录到容器/etc/nginx/conf.d目录
-            - "$PWD/conf.d:/etc/nginx/conf.d"
-            - "/sharedfolders/web/site80/html:/usr/share/nginx/html"
+            - "$PWD/nginx/conf.d:/etc/nginx/conf.d"
+            - "/sharedfolders/hd2/web/80:/var/www/html"
         networks:
-            - app_net
+            - web_net
         # 容器名称
-        container_name: "compose-nginx"
+        container_name: "web_nginx"
     php:
-        build: ./php-mysqli
-        image: php:7.3-fpm-mysqli
-        ports:
-            - "9000:9000"
+        build: ./php-mysql
+        # image: php:fpm-alpine
+        restart: always
+        # ports:
+        #     - "9000:9000"
         volumes:
-            - "/sharedfolders/web/site80/html:/var/www/html"
+            - "/sharedfolders/hd2/web/80:/var/www/html"
         networks:
-            - app_net
-        container_name: "compose-php"
-    mysql:
-        image: mysql:5.7
-        ports:
-            - "3306:3306"
-        # 环境变量
-        environment:
-            # mysql密码
-            - MYSQL_ROOT_PASSWORD=lldlcj123
-        networks:
-            app_net:
-                # 固定子网ip，网段必须在子网络192.168.8.*
-                ipv4_address: 192.168.8.6
-        container_name: "compose-mysql"
+            - web_net
+        container_name: "php-fpm"
+    # mysql:
+    #     image: mysql:5.7
+    #     ports:
+    #         - "3306:3306"
+    #     # 环境变量
+    #     environment:
+    #         # mysql密码
+    #         - MYSQL_ROOT_PASSWORD=lldlcj123
+    #     networks:
+    #         web_net:
+    #             # 固定子网ip，网段必须在子网络192.168.8.*
+    #             ipv4_address: 192.168.8.6
+    #     container_name: "compose-mysql"
 networks:
     # 配置docker network
-    app_net:
+    web_net:
         driver: bridge
-        ipam:
-            config:
-                # 子网络
-                - subnet: 192.168.8.0/24
+        # ipam:
+        #     config:
+        #         # 子网络
+        #         - subnet: 192.168.8.0/24
