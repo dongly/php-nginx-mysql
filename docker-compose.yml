@@ -13,9 +13,12 @@ services:
         volumes:
             # 映射主机./conf.d目录到容器/etc/nginx/conf.d目录
             - "$PWD/nginx/conf.d:/etc/nginx/conf.d"
-            - "/sharedfolders/hd2/web/80:/var/www/html"
+            - "/srv/hd/pub/web/80:/var/www/html"
         networks:
             - web_net
+        # networks:
+        #     web_net:
+        #        ipv4_address:  192.168.222.120
         # 容器名称
         container_name: "web_nginx"
     php:
@@ -25,7 +28,7 @@ services:
         # ports:
         #     - "9000:9000"
         volumes:
-            - "/sharedfolders/hd2/web/80:/var/www/html"
+            - "/srv/hd/pub/web/80:/var/www/html"
         networks:
             - web_net
         container_name: "php-fpm"
@@ -42,11 +45,19 @@ services:
     #             # 固定子网ip，网段必须在子网络192.168.8.*
     #             ipv4_address: 192.168.8.6
     #     container_name: "compose-mysql"
+
 networks:
     # 配置docker network
     web_net:
-        driver: bridge
-        # ipam:
-        #     config:
-        #         # 子网络
-        #         - subnet: 192.168.8.0/24
+
+# networks:
+#     # 配置docker network
+#     web_net:
+#         driver:  macvlan
+#         driver_opts:
+#             parent: ens18
+#         ipam:
+#             driver: default
+#             config:
+#                 - subnet: 192.168.222.0/23
+#                   gateway: 192.168.222.254
